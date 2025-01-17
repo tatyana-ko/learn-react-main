@@ -1,4 +1,106 @@
-:root {
+h3 {
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid black;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto 15px;
+  padding: 15px;
+  border-bottom: 1px solid black;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.main {
+  max-width: 1100px;
+  margin: 0 auto 15px;
+  padding: 15px;
+}
+
+.data-cart {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.data-cart-item {
+  display: flex;
+  padding: 10px;
+  margin-bottom: 10px;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+}
+
+.quantity-settings {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.quantity-settings-btn,
+.delete-item-btn {
+  padding: 0;
+  background-color: inherit;
+  border: none;
+}
+
+.plus-minus,
+.delete-item-btn-icon {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.promo-code {
+  min-width: 300px;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+}
+
+.purchase-amount-preview {
+  margin: 20px auto;
+}
+
+dt {
+  align-items: baseline;
+  display: flex;
+  white-space: nowrap;
+}
+
+dt::after {
+  content: "";
+  display: block;
+  height: 1px;
+  min-width: 25px;
+  width: 100%;
+  background-image: linear-gradient(90deg, currentcolor, currentcolor 25%, #0000 0, #0000);
+  background-size: 4px 1px;
+}
+
+/* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -65,4 +167,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */
