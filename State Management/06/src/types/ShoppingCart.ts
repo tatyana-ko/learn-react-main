@@ -12,7 +12,7 @@ export interface CartItem extends Product {
 }
 
 export interface Discount {
-  type: 'percentage' | 'fixed';
+  type: "percentage" | "fixed";
   value: number;
   code: string;
 }
@@ -42,4 +42,6 @@ export interface ShoppingCartProps {
   discounts: Discount[];
   minimumOrderValue: number;
   onCheckout?: (totals: CartTotals, items: CartItem[]) => void;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
 }
