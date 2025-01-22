@@ -1,5 +1,13 @@
-import { useMemo } from 'react';
-import { CartItem, Discount, ShippingRule, CartTotals } from '../types/ShoppingCart';
+import {
+  CartItem,
+  Discount,
+  ShippingRule,
+  CartTotals,
+} from "../types/ShoppingCart";
+import {
+  calculateTotalCount,
+  calculateTotalPrice,
+} from "../utils/calculateTotal";
 
 export const useCartCalculations = (
   items: CartItem[],
@@ -7,22 +15,57 @@ export const useCartCalculations = (
   shippingRules: ShippingRule[],
   appliedDiscount?: Discount
 ) => {
-  // TODO: Implement cart calculations
-  // 1. Calculate subtotal
-  // 2. Apply discount if present
-  // 3. Calculate tax
-  // 4. Determine shipping cost
-  // 5. Calculate total
-  // Use useMemo to optimize calculations
+  const totalCountOfProducts: number = calculateTotalCount(items);
+  let subtotal: number = calculateTotalPrice(items);
+  let discount: number = 0;
+  let shipping: number = 5;
+  let tax: number = 0;
+  let total: number = 0;
+  let isValid: boolean = false;
+
+  switch (appliedDiscount?.code) {
+    case "initial":
+      break;
+
+    case "SAVE10":
+      discount = subtotal * (appliedDiscount.value / 100);
+      break;
+
+    case "MINUS5":
+      discount = appliedDiscount.value;
+      break;
+
+    default:
+      break;
+  };
+
+  // не уверена 
+  shipping = shippingRules.reduce((acc, rule) => {
+    if(totalCountOfProducts < rule.minOrderValue) {
+      acc = 5; 
+    } else {
+      acc = 0;
+    };
+
+    return acc;
+  }, 0);
+
+
+  tax = subtotal * taxRate;
+  total = subtotal - discount + tax + shipping;
+
+  if (total < 0) {
+    isValid = true;
+  };
 
   return {
     totals: {
-      subtotal: 0,
-      discount: 0,
-      tax: 0,
-      shipping: 0,
-      total: 0,
+      subtotal,
+      discount,
+      tax,
+      shipping,
+      total,
     } as CartTotals,
-    isValid: false,
+    isValid,
   };
 };

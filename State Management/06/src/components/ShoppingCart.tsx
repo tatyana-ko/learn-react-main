@@ -1,110 +1,143 @@
-import React, { useEffect, useState } from 'react';
-import { Product, ShoppingCartProps } from '../types/ShoppingCart';
+import React, { useState } from 'react';
+import { Discount, ShoppingCartProps } from '../types/ShoppingCart';
 import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
 import { IoMdClose } from "react-icons/io";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { useSelector, useDispatch } from 'react-redux';
+import { removeProduct, increaseQuantity, decreaseQuantity, removeAllProducts } from '../redux/cartSlice';
+import { RootState } from '../app/store';
+import { useCartCalculations } from '../hooks/useCartCalculations';
 
 export const ShoppingCart: React.FC<ShoppingCartProps> = ({
-  products,
   taxRate,
   shippingRules,
   discounts,
   minimumOrderValue,
-  onCheckout,
   isCartOpen,
   setIsCartOpen,
+  totalCountOfProducts,
 }) => {
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    setAllProducts(products);
-  }, [products]);
-
-  const removeAllItemsFromCart = () => {
-    setAllProducts([]);
-  };
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const dispatch = useDispatch();
+  const [discount, setDiscount] = useState<Discount>({ type: "fixed", value: 0, code: "initial" });
+  const [errors, setErrors] = useState<{ invalidCode?: string }>({});
+  const { totals, isValid } = useCartCalculations(cartItems, taxRate, shippingRules, discount);
+  const freeShipping = 20 - totalCountOfProducts;
 
   const placeAnOrder = () => {
     console.log("place an order");
     // onCheckout();
   };
 
-  const removeProductFromCart = (id: string) => {
-    setAllProducts(prevState => {
-      return [...prevState.filter(prod => prod.id !== id)]
-    })
+  const removeAllProductsFromCart = () => {
+    //popup для подтверждения очистки корзины
+     dispatch(removeAllProducts());   
+  };
+
+  const calculateDiscount: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    const form = e.target as HTMLFormElement;
+    let discountValue = (form.elements.namedItem('discount') as HTMLInputElement).value;
+
+    const discountForApplication = discounts.find(d => d.code === discountValue);
+
+    if (discountForApplication) {
+      setDiscount(discountForApplication);
+      setErrors({});
+    } else {
+      (form.elements.namedItem('discount') as HTMLInputElement).value = "";
+      setErrors({ ...errors, invalidCode: "invalid code" });
+    };
+  };
+
+  const cancelDiscount = () => {
+    setDiscount({ type: "fixed", value: 0, code: "initial" });
   };
 
   return (
     <>
-      <aside className={isCartOpen? "fixed-position-cart": "none-position-cart"}>
+      <aside className={isCartOpen ? "fixed-position-cart" : "none-position-cart"}>
         <div className="cart-header">
-          <h2>Shopping Cart/ {allProducts.length} items</h2>
+          <div>
+            <h2>Shopping Cart/ {totalCountOfProducts} items</h2>
+            <p>Min quantity of products: {minimumOrderValue}</p>
+          </div>
           <button className="close-cart-btn" onClick={() => setIsCartOpen(false)}>
-            <IoMdClose className="close-cart-icon"/>
+            <IoMdClose className="close-cart-icon" />
           </button>
         </div>
 
-        <div className="cart-main">
+        {totalCountOfProducts === 0 ? <div>
+          <h3>The shopping cart is empty</h3>
+          <button onClick={() => setIsCartOpen(false)}>Order products</button>
+        </div> : <div className="cart-main">
+
           <ul className="data-cart">
-            {allProducts.map(product => {
-              const { id, name, price, weight, stock } = product;
+            {cartItems.map(product => {
+              const { id, name, price, stock, quantity } = product;
 
               return <li key={id} className="data-cart-item" >
                 <h3>{name}</h3>
-                <p>Total price: {(price * weight)}</p>
+                <p>Total price: {(price * quantity)}</p>
                 <div className="quantity-settings">
-                  <button className='quantity-settings-btn' disabled={weight <= 1}>
+                  <button className='quantity-settings-btn' disabled={quantity <= 1} onClick={() => dispatch(decreaseQuantity(id))}>
                     <CiCircleMinus className="plus-minus" />
                   </button>
-                  <p>{weight}</p>
-                  <button className='quantity-settings-btn' disabled={stock <= 0}>
+                  <p>{quantity}</p>
+                  <button className='quantity-settings-btn' disabled={stock <= 0} onClick={() => dispatch(increaseQuantity(id))}>
                     <CiCirclePlus className="plus-minus" />
                   </button>
                 </div>
-                <button className="delete-item-btn">
-                  <RiDeleteBin6Line className="delete-item-btn-icon" onClick={() => removeProductFromCart(id)} />
+                <button className="delete-item-btn" onClick={() => dispatch(removeProduct(id))}>
+                  <RiDeleteBin6Line className="delete-item-btn-icon" />
                 </button>
               </li>
             })}
           </ul>
 
+          {freeShipping > 0 ? <p>Number of products before free shipping: {freeShipping}</p> : ""}
+
           <div className="purchase-amount-preview">
+            {discount.code === "initial" ?
+              <form className="discount-form" onSubmit={e => calculateDiscount(e)}>
+                <label className="discount-group">
+                  <input type="text" id="discount" placeholder="enter discount code" className="discount" />
+                  {errors.invalidCode && <span className="error-message">{errors.invalidCode}</span>}
+                </label>
+                <button>Apply</button>
+              </form> : <button onClick={cancelDiscount}>Cancel discount</button>}
+
             <h3>Purchase amount</h3>
             <dl>
               <div>
                 <dt><p>Subtotal</p></dt>
-                <p>{999} $</p>
+                <p>{totals.subtotal} $</p>
               </div>
 
               <div>
                 <dt><p>Discount amount</p></dt>
-                <p> - {999} $</p>
+                <p> - {totals.discount} $</p>
+              </div>
+
+              <div>
+                <dt><p>Shipping cost</p></dt>
+                <p>{totals.shipping} $</p>
+              </div>
+
+              <div>
+                <dt><p>Tax</p></dt>
+                <p>{totals.tax} $</p>
               </div>
             </dl>
 
-            <h3>Cart total price . . . {1000} $</h3>
+            <h3 className="total-price">Cart total price: {totals.total} $</h3>
           </div>
 
-          <button onClick={placeAnOrder} disabled={allProducts.length === 0}>Place an order</button>
-          <button disabled={allProducts.length === 0} onClick={removeAllItemsFromCart}>Clear cart</button>
-        </div>
+          <button disabled={cartItems.length === 0 || isValid || totalCountOfProducts < minimumOrderValue} onClick={placeAnOrder}>Place an order</button>
+          <button disabled={cartItems.length === 0} onClick={removeAllProductsFromCart}>Clear cart</button>
+        </div>}
       </aside>
     </>
   );
 };
-
-// TODO: Implement the component
-// 1. Initialize cart state
-// 2. Create handlers for:
-//    - Adding items
-//    - Updating quantity
-//    - Removing items
-//    - Applying discount
-// 3. Use useCartCalculations for derived state
-// 4. Implement UI for:
-//    - Product list
-//    - Cart items
-//    - Totals
-//    - Discount form
-// 5. Add error handling and validation

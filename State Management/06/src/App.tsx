@@ -1,55 +1,56 @@
 import { useState } from 'react';
 import './App.css';
 import { ShoppingCart } from './components/ShoppingCart';
-import { Product } from './types/ShoppingCart';
+import { Discount, Product, ShippingRule } from './types/ShoppingCart';
+import { useSelector, useDispatch } from 'react-redux';
+import { addProduct } from './redux/cartSlice';
+import { RootState } from './app/store';
+import { calculateTotalCount } from './utils/calculateTotal';
 
-interface Item {
-  id: string;
-  name: string;
-  price: number;
-  stock: number;
-}
-
-const initialProductsArray: Item[] = [
+const initialProductsArray: Product[] = [
   {
     id: "1",
     name: "Product-1",
     price: 10,
+    weight: 1,
     stock: 5,
   },
   {
     id: "2",
     name: "Product-2",
     price: 20,
+    weight: 1,
     stock: 10,
   },
   {
     id: "3",
     name: "Product-3",
     price: 30,
+    weight: 1,
     stock: 20,
   }
 ];
 
+const discount: Discount[] = [
+  { type: 'percentage', value: 10, code: 'SAVE10' },
+  { type: 'fixed', value: 5, code: 'MINUS5' },
+];
+
+const shippingRules: ShippingRule[] = [
+  { minOrderValue: 0, cost: 5 },
+  { minOrderValue: 20, cost: 0 },
+];
+
 function App() {
-  const [products, setProducts] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  const addProductToCart = (product: Item) => {
-    const newProduct: Product = {
-      ...product,
-      weight: 1,
-    };
-
-    setProducts(prev => {
-      return [...prev, newProduct]
-    });
-  };
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const dispatch = useDispatch();
+  const totalCountOfProducts = calculateTotalCount(cartItems);
 
   return (
     <>
       <header className="header">
-        <button onClick={() => setIsCartOpen(true)}>Cart /{products.length}</button>
+        <button onClick={() => setIsCartOpen(true)}>Cart / {totalCountOfProducts}</button>
       </header>
 
       <main className="main">
@@ -61,16 +62,22 @@ function App() {
               <h3>{name}</h3>
               <p>Price: {price}</p>
               <p>In stock: {stock}</p>
-              <button onClick={() => addProductToCart(product)}>Add to cart</button>
+              <button onClick={() => dispatch(addProduct(product))}>Add to cart</button>
             </li>
           })}
         </ul>
       </main>
 
-      <ShoppingCart products={products} isCartOpen={isCartOpen} setIsCartOpen={setIsCartOpen} />
+      <ShoppingCart
+        taxRate={0.05}
+        discounts={discount}
+        minimumOrderValue={10}
+        shippingRules={shippingRules}
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+        totalCountOfProducts={totalCountOfProducts} />
     </>
-
   )
-}
+};
 
 export default App;

@@ -121,7 +121,7 @@ export function UserProfileForm({ onSubmit, initialData }: ProfileFormProps) {
     validate();
   };
 
-  const handleSubmitForm: React.ChangeEventHandler<HTMLFormElement> = (evt) => {
+  const handleSubmitForm: React.FormEventHandler<HTMLFormElement> = (evt) => {
     evt.preventDefault();
     onSubmit({
       displayName: name,

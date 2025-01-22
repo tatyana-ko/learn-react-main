@@ -10,7 +10,7 @@ interface ProductConfiguratorProps {
 // 2. Некорректно записываются изменения в историю при вводе данных в инпут (какждая буква)
 // 3. При отмене выбора waterproof (input checked) - из истории изменений не удаляется запись
 // 4. При сохранении данных - не понимаю как скинуть features и addons до первоначальных значений
-// 5. Тесты ("handles batch updates correctly") - не понимаю, что нужно сделатьq
+// 5. Тесты ("handles batch updates correctly") - не понимаю, что нужно сделать
 
 export function ProductConfigurator({ initialConfig, onSave }: ProductConfiguratorProps) {
   const [basics, setBasics] = useState(initialConfig.basics);
@@ -209,7 +209,7 @@ export function ProductConfigurator({ initialConfig, onSave }: ProductConfigurat
     } else {
       onSave({ basics, features, addons });
       setBasics(initialConfig.basics);
-      // setFeatures();
+      // setFeatures({);
       // setAddons();
       setHistoryChanges([]);
       setErrors({});
@@ -334,4 +334,5 @@ export function ProductConfigurator({ initialConfig, onSave }: ProductConfigurat
     </div>
   );
 };
+
 

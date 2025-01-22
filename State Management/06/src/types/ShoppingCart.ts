@@ -36,7 +36,6 @@ export interface CartState {
 }
 
 export interface ShoppingCartProps {
-  products: Product[];
   taxRate: number;
   shippingRules: ShippingRule[];
   discounts: Discount[];
@@ -44,4 +43,5 @@ export interface ShoppingCartProps {
   onCheckout?: (totals: CartTotals, items: CartItem[]) => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  totalCountOfProducts: number;
 }

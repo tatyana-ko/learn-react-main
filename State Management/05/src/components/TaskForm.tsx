@@ -19,6 +19,18 @@ export const TaskForm = (props: TaskFormProps) => {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState<TaskPriority>("low");
 
+  // Модалка
+  // const dialogRef = useRef<HTMLDialogElement>(null);
+
+//   useEffect(() => {
+//     if (dialogRef.current?.open && !props.modalOpen) {
+//       dialogRef.current?.close()
+//     } else if (!dialogRef.current?.open && props.modalOpen) {
+//       dialogRef.current?.showModal()
+//     }
+// }, [props.modalOpen]);
+//   ref={dialogRef}
+
   const handleAddTask = () => {
     if (!title) {
       return;

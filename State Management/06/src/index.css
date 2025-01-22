@@ -59,12 +59,14 @@ button:disabled {
 /* Cart */
 
 .fixed-position-cart {
+  text-align: center;
   z-index: 99;
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
   padding: 15px;
+  min-width: 650px;
   background-color: #f8f9fa;
 }
 
@@ -84,7 +86,6 @@ button:disabled {
 .cart-main {
   margin: 0 auto;
   padding: 15px;
-  text-align: center;
 }
 
 .data-cart {
@@ -131,6 +132,10 @@ button:disabled {
   margin: 20px auto;
 }
 
+.purchase-amount-preview h3 {
+  margin: 10px auto;
+}
+
 dl {
   display: flex;
   flex-direction: column;
@@ -157,3 +162,27 @@ dt::after {
   background-size: 4px 1px;
 }
 
+.discount-form {
+  margin: 10px;
+}
+
+.discount-group {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.discount {
+  margin-right: 8px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.total-price {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
